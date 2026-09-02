@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.1.0",
+  "plan_id": "plan:req-20260818-0001:v1",
+  "request_id": "req:20260818:0001",
+  "status": "published",
+  "title": "北京三日行程",
+  "overview": "行程摘要",
+  "request_summary": {},
+  "lodging_recommendations": [
+    {
+      "area_id": "map:qianmen",
+      "name": "前门大街",
+      "level": "首选",
+      "representative_station": "前门地铁站",
+      "reason": "位于景点分布中心",
+      "covered_attractions": [
+        "故宫博物院"
+      ],
+      "avg_transit_min": 20
+    }
+  ],
+  "days": [
+    {
+      "day_index": 1,
+      "date": "2026-10-01",
+      "theme": "皇城建筑线",
+      "start_time": "09:00",
+      "end_time": "20:00",
+      "items": [
+        {
+          "item_id": "d1-i1",
+          "poi": {
+            "poi_id": "map:forbidden_city",
+            "canonical_name": "故宫博物院",
+            "map_source": "mock"
+          },
+          "start_time": "09:00",
+          "end_time": "12:00",
+          "stay_duration_min": 180,
+          "booking_reminder": null,
+          "route_from_previous": null,
+          "photo_spots": []
+        }
+      ]
+    }
+  ],
+  "limitations": [],
+  "validation": {
+    "status": "pending",
+    "checks": [],
+    "checked_at": null
+  },
+  "planner": {
+    "model": "mock",
+    "model_version": "0.1.0",
+    "prompt_version": "planner-v1.1"
+  },
+  "generated_at": "2026-08-18T12:09:00+08:00"
+}

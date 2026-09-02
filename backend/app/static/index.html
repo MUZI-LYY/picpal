@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>北京 AI 旅行规划助手（验收界面）</title>
+  <style>
+    :root { --brand:#c2410c; --bg:#f8fafc; --card:#fff; --line:#e2e8f0; --text:#0f172a; --muted:#64748b; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+    .wrap { max-width:760px; margin:0 auto; padding:24px 16px 64px; }
+    h1 { font-size:22px; color:var(--brand); margin:0 0 4px; }
+    .sub { color:var(--muted); font-size:13px; margin-bottom:20px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:16px; }
+    textarea { width:100%; min-height:88px; border:1px solid var(--line); border-radius:8px; padding:10px; font-size:15px; resize:vertical; font-family:inherit; }
+    .row { display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; }
+    .field { display:flex; flex-direction:column; font-size:13px; color:var(--muted); }
+    .field input, .field select { padding:8px; border:1px solid var(--line); border-radius:8px; font-size:14px; margin-top:4px; }
+    button { background:var(--brand); color:#fff; border:none; border-radius:8px; padding:11px 22px; font-size:15px; cursor:pointer; margin-top:14px; }
+    button:disabled { opacity:.5; cursor:not-allowed; }
+    .example { font-size:13px; color:var(--muted); margin-top:8px; }
+    .example a { color:var(--brand); cursor:pointer; }
+    .stages { display:flex; flex-wrap:wrap; gap:8px; margin:8px 0; }
+    .stage { font-size:12px; padding:4px 10px; border-radius:99px; background:#e2e8f0; color:var(--muted); }
+    .stage.done { background:#dcfce7; color:#15803d; }
+    .stage.active { background:#ffedd5; color:#c2410c; }
+    h2 { font-size:16px; margin:0 0 10px; }
+    .day { border-left:3px solid var(--brand); padding-left:12px; margin:16px 0; }
+    .day h3 { margin:0 0 6px; font-size:15px; }
+    .item { border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin:8px 0; background:#fafafa; }
+    .item .name { font-weight:600; }
+    .item .meta { font-size:12px; color:var(--muted); }
+    .route { font-size:13px; color:#475569; background:#f1f5f9; border-radius:6px; padding:6px 10px; margin:4px 0; }
+    .spots { display:grid; grid-template-columns:repeat(auto-fill,200px); gap:12px; margin-top:8px; }
+    .spot-card { border:1px solid var(--line); border-radius:10px; overflow:hidden; background:#fff; display:flex; flex-direction:column; box-shadow:0 1px 2px rgba(15,23,42,.05); }
+    .spot-photo { position:relative; aspect-ratio:4/3; background:#f1f5f9; }
+    .spot-photo img { width:100%; height:100%; object-fit:cover; display:block; }
+    .spot-photo.ph { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; background:linear-gradient(135deg,#f8fafc,#e2e8f0); color:var(--muted); }
+    .ph-icon { font-size:28px; }
+    .ph-label { font-size:12px; }
+    .ph-name { font-size:11px; color:#94a3b8; max-width:90%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .ph-alt { position:absolute; inset:0; }
+    .spot-body { padding:10px 12px; display:flex; flex-direction:column; gap:4px; font-size:13px; }
+    .spot-name { font-weight:600; }
+    .spot-loc { color:#334155; }
+    .spot-bt { color:var(--brand); font-size:12px; }
+    .spot-src { font-size:12px; color:var(--muted); }
+    .spot-src a { color:var(--brand); }
+    .err { color:#b91c1c; background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:10px; }
+    .assume { font-size:12px; color:var(--muted); background:#f8fafc; border:1px dashed var(--line); border-radius:6px; padding:6px 10px; }
+    .lodge-line { background:#f0fdf4; border-color:#bbf7d0; font-size:14px; }
+    .hidden { display:none; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>北京 AI 旅行规划助手</h1>
+  <div class="sub">一次性验收界面（mock 数据，仅验证核心链路与契约）</div>
+
+  <div class="card">
+    <textarea id="text" placeholder="例如：中秋去北京玩三天，和朋友一起，想去故宫、天坛，多安排适合拍照的地方。"></textarea>
+    <div class="row">
+      <div class="field">游玩天数
+        <select id="days"><option value="">自动</option><option>1</option><option>2</option><option selected>3</option></select>
+      </div>
+      <div class="field">出行日期
+        <input id="start_date" type="date" />
+      </div>
+      <div class="field">节奏
+        <select id="pace"><option value="">自动</option><option>轻松</option><option>适中</option><option>紧凑</option></select>
+      </div>
+    </div>
+    <button id="go" onclick="start()">生成北京行程</button>
+    <div class="example">试试：<a onclick="fill('中秋去北京玩三天，和朋友一起，想去故宫、天坛，多安排适合拍照的地方')">示例1</a> · <a onclick="fill('周末北京两天，轻松一点，喜欢胡同和夜景')">示例2</a> · <a onclick="fill('国庆去北京3天，带父母，想去长城和颐和园，少走路')">示例3</a></div>
+  </div>
+
+  <div id="progress" class="card hidden"></div>
+  <div id="result"></div>
+</div>
+
+<script>
+const STAGES = ["parsing","planning","retrieving_photo_spots","draft","validating","validated"];
+const STAGE_LABEL = {parsing:"理解旅行需求",planning:"匹配北京景点与路线",retrieving_photo_spots:"检索景点出片点",draft:"生成候选行程",validating:"检查行程合理性",validated:"完成"};
+let timer = null;
+
+function fill(t){ document.getElementById('text').value = t; }
+
+async function start(){
+  const text = document.getElementById('text').value.trim();
+  if(!text){ alert('请输入旅行需求'); return; }
+  const btn = document.getElementById('go'); btn.disabled = true;
+  document.getElementById('result').innerHTML = '';
+  const payload = { text };
+  const days = document.getElementById('days').value;
+  const start_date = document.getElementById('start_date').value;
+  const pace = document.getElementById('pace').value;
+  if(days) payload.days = parseInt(days);
+  if(start_date) payload.start_date = start_date;
+  if(pace) payload.pace = pace;
+
+  const resp = await fetch('/api/v1/trips', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+  if(resp.status !== 202){ const b = await resp.json(); showError(b); btn.disabled=false; return; }
+  const {task_id} = await resp.json();
+  document.getElementById('progress').classList.remove('hidden');
+  poll(task_id, btn);
+}
+
+async function poll(task_id, btn){
+  const resp = await fetch('/api/v1/trips/' + task_id);
+  const rec = await resp.json();
+  renderStages(rec);
+  const ACTIVE = ['parsing','planning','retrieving_photo_spots','draft','validating'];
+  if(!ACTIVE.includes(rec.status)){  // validated / failed / 各类失败态均为终态
+    clearTimeout(timer);
+    btn.disabled = false;
+    renderResult(rec);
+  } else {
+    timer = setTimeout(() => poll(task_id, btn), 600);
+  }
+}
+
+function renderStages(rec){
+  const history = (rec.stage_history||[]).map(h=>h.stage);
+  const html = '<div class="stages">' + STAGES.map(s=>{
+    const cls = history.includes(s) ? (s===rec.status?'active':'done') : '';
+    const mark = history.includes(s) ? '✓ ' : '';
+    return `<span class="stage ${cls}">${mark}${STAGE_LABEL[s]||s}</span>`;
+  }).join('') + '</div>';
+  const extra = rec.error ? `<div class="err">失败：${rec.error}</div>` : '';
+  document.getElementById('progress').innerHTML = '<h2>生成进度</h2>' + html + extra;
+}
+
+function showError(b){
+  document.getElementById('result').innerHTML = `<div class="err">${b.error ? b.error.message : JSON.stringify(b)}</div>`;
+}
+
+function renderResult(rec){
+  if(rec.error){ showError({error:{message:rec.error}}); return; }
+  const plan = rec.plan;
+  if(!plan){ document.getElementById('result').innerHTML = '<div class="err">无结果</div>'; return; }
+  if(plan.status !== 'validated'){
+    const failures = ((plan.validation||{}).checks||[]).filter(c=>c.severity==='fail');
+    const detail = failures.length ? failures.map(c=>esc(c.message)).join('；') : '行程未通过最终校验';
+    document.getElementById('result').innerHTML = `<div class="err">${detail}</div>`;
+    return;
+  }
+  let html = '';
+
+  // 概览
+  html += `<div class="card"><h2>${esc(plan.title)}</h2><div class="sub">${esc(plan.overview)}</div>`;
+  if(plan.request_summary && plan.request_summary.companions && plan.request_summary.companions.length){
+    html += `<div class="assume">同行：${esc(plan.request_summary.companions.join('、'))} · 节奏：${esc(plan.request_summary.pace||'未指定')}</div>`;
+  }
+  const assumptions = rec.parsed_request ? rec.parsed_request.assumptions : [];
+  if(assumptions.length) html += `<div class="assume">系统假设：${esc(assumptions.join('；'))}</div>`;
+  html += '</div>';
+
+  // 逐日行程
+  (plan.days||[]).forEach(day=>{
+    html += `<div class="card"><div class="day"><h3>第 ${day.day_index} 天${day.date?' · '+day.date:''}${day.theme?' · '+esc(day.theme):''}</h3>`;
+    (day.items||[]).forEach((it,i)=>{
+      if(it.route_from_previous){
+        const r = it.route_from_previous;
+        const originLabel = i===0 ? '从住宿出发 · ' : '';
+        html += `<div class="route">🚇 ${originLabel}${esc(r.recommended_mode)} 约 ${r.duration_min} 分钟${r.distance_km!=null?' · '+r.distance_km+' 公里':''} — ${esc(r.reason||'')}</div>`;
+      }
+      html += `<div class="item"><div class="name">${esc(it.poi.canonical_name)}</div><div class="meta">${esc(it.start_time||'')}—${esc(it.end_time||'')} · 游玩约 ${it.stay_duration_min} 分钟${it.booking_reminder?' · ⚠️'+esc(it.booking_reminder):''}</div>`;
+      if(it.photo_spots && it.photo_spots.length){
+        html += `<div class="sub">出片点（${it.photo_spots.length}）</div><div class="spots">` + it.photo_spots.map(spotCard).join('') + '</div>';
+      } else {
+        html += `<div class="sub">该景点暂未收录出片点</div>`;
+      }
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+
+  // 校验说明
+  if(plan.validation && plan.validation.checks){
+    const warns = plan.validation.checks.filter(c=>c.severity==='warning');
+    if(warns.length) html += `<div class="card"><h2>行程提示</h2>` + warns.map(c=>`<div class="assume">· ${esc(c.message)}</div>`).join('') + '</div>';
+  }
+
+  // 住宿区域推荐（放最底部，一句话）
+  if(plan.lodging_recommendations && plan.lodging_recommendations.length){
+    const current = plan.lodging_recommendations.find(l=>l.level==='当前住宿评估');
+    const primary = plan.lodging_recommendations.find(l=>l.level==='首选') || plan.lodging_recommendations[0];
+    const alts = plan.lodging_recommendations.filter(l=>l.level==='备选').map(l=>l.name);
+    const altsTxt = alts.length ? '；备选：' + alts.map(esc).join('、') : '';
+    const avgTxt = primary.avg_transit_min!=null ? `。到主要景点平均约 ${primary.avg_transit_min} 分钟` : '';
+    const currentTxt = current ? `当前住宿：<b>${esc(current.name)}</b>，${esc(current.reason)}。<br>` : '';
+    html += `<div class="card lodge-line">🏨 ${currentTxt}推荐住宿区域：<b>${esc(primary.name)}</b>（首选）${altsTxt}${avgTxt}。</div>`;
+  }
+
+  document.getElementById('result').innerHTML = html;
+}
+
+function spotCard(s){
+  const photo = s.reference_photos && s.reference_photos[0];
+  const url = photo ? (photo.thumbnail_url || photo.storage_url) : null;
+  const isReal = url && !/example\.invalid/.test(url);
+  let photoHtml;
+  if(isReal){
+    photoHtml = `<div class="spot-photo"><img src="${esc(url)}" alt="${esc(s.spot_name)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"/><div class="ph ph-alt" style="display:none"><span class="ph-icon">📷</span><span class="ph-label">图片加载失败</span></div></div>`;
+  } else {
+    photoHtml = `<div class="spot-photo ph"><span class="ph-icon">📷</span><span class="ph-label">参考照片</span><span class="ph-name">${esc(s.spot_name)}</span></div>`;
+  }
+  const src = s.source_refs && s.source_refs[0];
+  let srcHtml = '';
+  if(src){
+    srcHtml = `<div class="spot-src">来源：${esc(src.source_platform)}${src.source_author?' / '+esc(src.source_author):''}${src.source_url?' · <a href="'+esc(src.source_url)+'" target="_blank" rel="noopener">查看原内容</a>':''}</div>`;
+  }
+  let btHtml = '';
+  if(s.best_time) btHtml = `<div class="spot-bt">🕐 ${esc(s.best_time.display_text)}</div>`;
+  return `<div class="spot-card">${photoHtml}<div class="spot-body"><div class="spot-name">${esc(s.spot_name)}</div><div class="spot-loc">位置：${esc(s.location_description)}</div>${btHtml}${srcHtml}</div></div>`;
+}
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+</script>
+</body>
+</html>

@@ -1,0 +1,824 @@
+{
+  "$defs": {
+    "BestTime": {
+      "properties": {
+        "type": {
+          "enum": [
+            "固定时段",
+            "日出关联",
+            "日落关联",
+            "亮灯后",
+            "季节性"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "display_text": {
+          "title": "Display Text",
+          "type": "string"
+        },
+        "applicable_seasons": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Applicable Seasons"
+        },
+        "applicable_weather": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Applicable Weather"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "type",
+        "display_text",
+        "source_ids",
+        "confidence"
+      ],
+      "title": "BestTime",
+      "type": "object"
+    },
+    "Coordinate": {
+      "properties": {
+        "latitude": {
+          "title": "Latitude",
+          "type": "number"
+        },
+        "longitude": {
+          "title": "Longitude",
+          "type": "number"
+        },
+        "coordinate_system": {
+          "default": "GCJ-02",
+          "enum": [
+            "GCJ-02",
+            "WGS-84",
+            "BD-09"
+          ],
+          "title": "Coordinate System",
+          "type": "string"
+        }
+      },
+      "required": [
+        "latitude",
+        "longitude"
+      ],
+      "title": "Coordinate",
+      "type": "object"
+    },
+    "ItineraryDay": {
+      "properties": {
+        "day_index": {
+          "minimum": 1,
+          "title": "Day Index",
+          "type": "integer"
+        },
+        "date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Date"
+        },
+        "theme": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Theme"
+        },
+        "start_time": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Time"
+        },
+        "end_time": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Time"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/ItineraryItem"
+          },
+          "title": "Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "day_index"
+      ],
+      "title": "ItineraryDay",
+      "type": "object"
+    },
+    "ItineraryItem": {
+      "properties": {
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "poi": {
+          "$ref": "#/$defs/POI"
+        },
+        "start_time": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Time"
+        },
+        "end_time": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Time"
+        },
+        "stay_duration_min": {
+          "minimum": 0,
+          "title": "Stay Duration Min",
+          "type": "integer"
+        },
+        "booking_reminder": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Booking Reminder"
+        },
+        "entry_tip": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entry Tip"
+        },
+        "route_from_previous": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RouteSegment"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "photo_spots": {
+          "items": {
+            "$ref": "#/$defs/PhotoSpotHit"
+          },
+          "title": "Photo Spots",
+          "type": "array"
+        }
+      },
+      "required": [
+        "item_id",
+        "poi",
+        "stay_duration_min"
+      ],
+      "title": "ItineraryItem",
+      "type": "object"
+    },
+    "Limitation": {
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "Limitation",
+      "type": "object"
+    },
+    "LodgingRecommendation": {
+      "properties": {
+        "area_id": {
+          "title": "Area Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "level": {
+          "enum": [
+            "首选",
+            "备选",
+            "当前住宿评估"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "representative_station": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Representative Station"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "covered_attractions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Covered Attractions",
+          "type": "array"
+        },
+        "avg_transit_min": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Avg Transit Min"
+        }
+      },
+      "required": [
+        "area_id",
+        "name",
+        "level",
+        "reason"
+      ],
+      "title": "LodgingRecommendation",
+      "type": "object"
+    },
+    "POI": {
+      "properties": {
+        "poi_id": {
+          "title": "Poi Id",
+          "type": "string"
+        },
+        "canonical_name": {
+          "title": "Canonical Name",
+          "type": "string"
+        },
+        "map_source": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Map Source"
+        }
+      },
+      "required": [
+        "poi_id",
+        "canonical_name"
+      ],
+      "title": "POI",
+      "type": "object"
+    },
+    "PhotoSpotHit": {
+      "properties": {
+        "spot_id": {
+          "title": "Spot Id",
+          "type": "string"
+        },
+        "poi_id": {
+          "title": "Poi Id",
+          "type": "string"
+        },
+        "spot_name": {
+          "title": "Spot Name",
+          "type": "string"
+        },
+        "coordinate": {
+          "$ref": "#/$defs/Coordinate"
+        },
+        "location_description": {
+          "title": "Location Description",
+          "type": "string"
+        },
+        "location_precision": {
+          "enum": [
+            "exact_poi",
+            "named_sub_poi",
+            "approximate"
+          ],
+          "title": "Location Precision",
+          "type": "string"
+        },
+        "reference_photos": {
+          "items": {
+            "$ref": "#/$defs/ReferencePhoto"
+          },
+          "title": "Reference Photos",
+          "type": "array"
+        },
+        "best_time": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BestTime"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "source_refs": {
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "ingestion_status": {
+          "const": "auto_verified",
+          "default": "auto_verified",
+          "title": "Ingestion Status",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "spot_id",
+        "poi_id",
+        "spot_name",
+        "coordinate",
+        "location_description",
+        "location_precision",
+        "confidence"
+      ],
+      "title": "PhotoSpotHit",
+      "type": "object"
+    },
+    "PlannerInfo": {
+      "properties": {
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model"
+        },
+        "model_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Version"
+        },
+        "prompt_version": {
+          "default": "planner-v1.1",
+          "title": "Prompt Version",
+          "type": "string"
+        }
+      },
+      "title": "PlannerInfo",
+      "type": "object"
+    },
+    "ReferencePhoto": {
+      "properties": {
+        "image_id": {
+          "title": "Image Id",
+          "type": "string"
+        },
+        "storage_url": {
+          "title": "Storage Url",
+          "type": "string"
+        },
+        "thumbnail_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Thumbnail Url"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "image_id",
+        "storage_url",
+        "source_id"
+      ],
+      "title": "ReferencePhoto",
+      "type": "object"
+    },
+    "RouteSegment": {
+      "description": "相邻行程节点之间的移动方案。route_from_previous 由地图工具回填。",
+      "properties": {
+        "origin_poi_id": {
+          "title": "Origin Poi Id",
+          "type": "string"
+        },
+        "destination_poi_id": {
+          "title": "Destination Poi Id",
+          "type": "string"
+        },
+        "recommended_mode": {
+          "enum": [
+            "步行",
+            "公共交通",
+            "打车",
+            "驾车"
+          ],
+          "title": "Recommended Mode",
+          "type": "string"
+        },
+        "duration_min": {
+          "title": "Duration Min",
+          "type": "integer"
+        },
+        "distance_km": {
+          "title": "Distance Km",
+          "type": "number"
+        },
+        "cost_cny": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cost Cny"
+        },
+        "walk_distance_m": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Walk Distance M"
+        },
+        "transfers": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Transfers"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "origin_poi_id",
+        "destination_poi_id",
+        "recommended_mode",
+        "duration_min",
+        "distance_km",
+        "reason"
+      ],
+      "title": "RouteSegment",
+      "type": "object"
+    },
+    "SourceRef": {
+      "properties": {
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "source_platform": {
+          "title": "Source Platform",
+          "type": "string"
+        },
+        "source_author": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Author"
+        },
+        "source_url": {
+          "title": "Source Url",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "source_id",
+        "source_platform",
+        "source_url"
+      ],
+      "title": "SourceRef",
+      "type": "object"
+    },
+    "ValidationCheck": {
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "fail",
+            "warning",
+            "spot_fail"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "day_index": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Day Index"
+        },
+        "item_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Item Id"
+        },
+        "spot_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Spot Id"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "ValidationCheck",
+      "type": "object"
+    },
+    "ValidationResult": {
+      "properties": {
+        "status": {
+          "default": "pending",
+          "enum": [
+            "pending",
+            "pass",
+            "fail"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "checks": {
+          "items": {
+            "$ref": "#/$defs/ValidationCheck"
+          },
+          "title": "Checks",
+          "type": "array"
+        },
+        "checked_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checked At"
+        }
+      },
+      "title": "ValidationResult",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": "1.1.0",
+      "default": "1.1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "plan_id": {
+      "title": "Plan Id",
+      "type": "string"
+    },
+    "request_id": {
+      "title": "Request Id",
+      "type": "string"
+    },
+    "status": {
+      "default": "draft",
+      "enum": [
+        "draft",
+        "validated",
+        "failed"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "overview": {
+      "title": "Overview",
+      "type": "string"
+    },
+    "request_summary": {
+      "title": "Request Summary",
+      "type": "object"
+    },
+    "lodging_recommendations": {
+      "items": {
+        "$ref": "#/$defs/LodgingRecommendation"
+      },
+      "title": "Lodging Recommendations",
+      "type": "array"
+    },
+    "days": {
+      "items": {
+        "$ref": "#/$defs/ItineraryDay"
+      },
+      "title": "Days",
+      "type": "array"
+    },
+    "limitations": {
+      "items": {
+        "$ref": "#/$defs/Limitation"
+      },
+      "title": "Limitations",
+      "type": "array"
+    },
+    "validation": {
+      "$ref": "#/$defs/ValidationResult"
+    },
+    "planner": {
+      "$ref": "#/$defs/PlannerInfo"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "plan_id",
+    "request_id",
+    "title",
+    "overview",
+    "generated_at"
+  ],
+  "title": "ItineraryPlan",
+  "type": "object"
+}

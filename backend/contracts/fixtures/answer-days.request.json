@@ -1,0 +1,10 @@
+{
+  "client_message_id": "msg-client-002",
+  "text": "3 天",
+  "reply_to_message_id": "msg-assistant-days",
+  "structured_answer": {
+    "slot": "days",
+    "value": 3
+  },
+  "base_plan_id": null
+}

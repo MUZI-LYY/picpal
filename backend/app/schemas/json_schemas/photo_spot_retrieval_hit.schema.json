@@ -1,0 +1,382 @@
+{
+  "$defs": {
+    "BestTime": {
+      "properties": {
+        "type": {
+          "enum": [
+            "固定时段",
+            "日出关联",
+            "日落关联",
+            "亮灯后",
+            "季节性"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "display_text": {
+          "title": "Display Text",
+          "type": "string"
+        },
+        "applicable_seasons": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Applicable Seasons"
+        },
+        "applicable_weather": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Applicable Weather"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "type",
+        "display_text",
+        "source_ids",
+        "confidence"
+      ],
+      "title": "BestTime",
+      "type": "object"
+    },
+    "Coordinate": {
+      "properties": {
+        "latitude": {
+          "title": "Latitude",
+          "type": "number"
+        },
+        "longitude": {
+          "title": "Longitude",
+          "type": "number"
+        },
+        "coordinate_system": {
+          "default": "GCJ-02",
+          "enum": [
+            "GCJ-02",
+            "WGS-84",
+            "BD-09"
+          ],
+          "title": "Coordinate System",
+          "type": "string"
+        }
+      },
+      "required": [
+        "latitude",
+        "longitude"
+      ],
+      "title": "Coordinate",
+      "type": "object"
+    },
+    "PhotoSpotHit": {
+      "properties": {
+        "spot_id": {
+          "title": "Spot Id",
+          "type": "string"
+        },
+        "poi_id": {
+          "title": "Poi Id",
+          "type": "string"
+        },
+        "spot_name": {
+          "title": "Spot Name",
+          "type": "string"
+        },
+        "coordinate": {
+          "$ref": "#/$defs/Coordinate"
+        },
+        "location_description": {
+          "title": "Location Description",
+          "type": "string"
+        },
+        "location_precision": {
+          "enum": [
+            "exact_poi",
+            "named_sub_poi",
+            "approximate"
+          ],
+          "title": "Location Precision",
+          "type": "string"
+        },
+        "reference_photos": {
+          "items": {
+            "$ref": "#/$defs/ReferencePhoto"
+          },
+          "title": "Reference Photos",
+          "type": "array"
+        },
+        "best_time": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BestTime"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "source_refs": {
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "ingestion_status": {
+          "const": "auto_verified",
+          "default": "auto_verified",
+          "title": "Ingestion Status",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "spot_id",
+        "poi_id",
+        "spot_name",
+        "coordinate",
+        "location_description",
+        "location_precision",
+        "confidence"
+      ],
+      "title": "PhotoSpotHit",
+      "type": "object"
+    },
+    "Pipeline": {
+      "properties": {
+        "knowledge_index_version": {
+          "default": "beijing-photo-spot-v1",
+          "title": "Knowledge Index Version",
+          "type": "string"
+        },
+        "embedding_model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Embedding Model"
+        },
+        "reranker_model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reranker Model"
+        },
+        "fallback_used": {
+          "default": false,
+          "title": "Fallback Used",
+          "type": "boolean"
+        }
+      },
+      "title": "Pipeline",
+      "type": "object"
+    },
+    "ReferencePhoto": {
+      "properties": {
+        "image_id": {
+          "title": "Image Id",
+          "type": "string"
+        },
+        "storage_url": {
+          "title": "Storage Url",
+          "type": "string"
+        },
+        "thumbnail_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Thumbnail Url"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "image_id",
+        "storage_url",
+        "source_id"
+      ],
+      "title": "ReferencePhoto",
+      "type": "object"
+    },
+    "RetrievalQuery": {
+      "properties": {
+        "photo_preferences": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Photo Preferences",
+          "type": "array"
+        },
+        "planned_visit_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Planned Visit Date"
+        },
+        "planned_arrival_time": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Planned Arrival Time"
+        }
+      },
+      "title": "RetrievalQuery",
+      "type": "object"
+    },
+    "SourceRef": {
+      "properties": {
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "source_platform": {
+          "title": "Source Platform",
+          "type": "string"
+        },
+        "source_author": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Author"
+        },
+        "source_url": {
+          "title": "Source Url",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "source_id",
+        "source_platform",
+        "source_url"
+      ],
+      "title": "SourceRef",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": "1.1.0",
+      "default": "1.1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "retrieval_run_id": {
+      "title": "Retrieval Run Id",
+      "type": "string"
+    },
+    "request_id": {
+      "title": "Request Id",
+      "type": "string"
+    },
+    "poi_id": {
+      "title": "Poi Id",
+      "type": "string"
+    },
+    "query": {
+      "$ref": "#/$defs/RetrievalQuery"
+    },
+    "pipeline": {
+      "$ref": "#/$defs/Pipeline"
+    },
+    "hits": {
+      "items": {
+        "$ref": "#/$defs/PhotoSpotHit"
+      },
+      "title": "Hits",
+      "type": "array"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "retrieval_run_id",
+    "request_id",
+    "poi_id",
+    "generated_at"
+  ],
+  "title": "PhotoSpotRetrievalHit",
+  "type": "object"
+}

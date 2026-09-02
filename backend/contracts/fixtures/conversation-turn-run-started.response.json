@@ -1,0 +1,74 @@
+{
+  "data": {
+    "conversation": {
+      "id": "conv-example",
+      "title": "北京经典与胡同 3 日游",
+      "status": "generating",
+      "requirements": {
+        "city": "北京",
+        "days": 3,
+        "date_status": "pending",
+        "start_date": null,
+        "party_size": null,
+        "companion_types": [],
+        "must_include": [],
+        "must_exclude": [],
+        "interests": ["经典景点", "胡同"],
+        "photo_preferences": [],
+        "pace": "轻松",
+        "lodging_text": null,
+        "transport_preferences": ["少走路"],
+        "missing_slots": []
+      },
+      "latest_plan_id": null,
+      "active_run_id": "run-example",
+      "created_at": "2026-08-21T10:00:00Z",
+      "updated_at": "2026-08-21T10:02:00Z"
+    },
+    "accepted_message": {
+      "id": "msg-user-date",
+      "conversation_id": "conv-example",
+      "role": "user",
+      "content_type": "text",
+      "text": "日期待定",
+      "structured_content": null,
+      "reply_to_message_id": "msg-assistant-date",
+      "run_id": null,
+      "plan_id": null,
+      "created_at": "2026-08-21T10:02:00Z"
+    },
+    "assistant_messages": [
+      {
+        "id": "msg-assistant-run",
+        "conversation_id": "conv-example",
+        "role": "assistant",
+        "content_type": "run_started",
+        "text": "了解，我会按北京 3 天、日期待定、节奏轻松来规划。",
+        "structured_content": {
+          "kind": "run_started",
+          "run_id": "run-example"
+        },
+        "reply_to_message_id": "msg-user-date",
+        "run_id": "run-example",
+        "plan_id": null,
+        "created_at": "2026-08-21T10:02:01Z"
+      }
+    ],
+    "active_run": {
+      "id": "run-example",
+      "conversation_id": "conv-example",
+      "kind": "initial_plan",
+      "status": "queued",
+      "trigger_message_id": "msg-user-date",
+      "base_plan_id": null,
+      "result_plan_id": null,
+      "current_stage": null,
+      "stages": [],
+      "error": null,
+      "created_at": "2026-08-21T10:02:01Z",
+      "started_at": null,
+      "finished_at": null
+    },
+    "latest_plan": null
+  }
+}

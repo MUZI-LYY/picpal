@@ -1,0 +1,144 @@
+{
+  "data": {
+    "id": "plan-example-v1",
+    "conversation_id": "conv-example",
+    "run_id": "run-example",
+    "version": 1,
+    "base_plan_id": null,
+    "status": "validated",
+    "changed_days": [1],
+    "change_summary": [
+      "生成第一版北京行程"
+    ],
+    "plan": {
+      "schema_version": "1.2.0",
+      "plan_id": "plan-example-v1",
+      "request_id": "req-example",
+      "status": "validated",
+      "title": "北京经典与城市漫游 1 日",
+      "overview": "从王府井附近出发，游览故宫并返回住宿区域。",
+      "request_summary": {
+        "days": 1,
+        "date_status": "pending",
+        "pace": "轻松"
+      },
+      "lodging_recommendations": [
+        {
+          "area_id": "map:wangfujing",
+          "name": "东单—王府井地铁站周边",
+          "level": "首选",
+          "representative_station": "王府井站",
+          "reason": "前往故宫交通方便，餐饮和地铁选择集中。",
+          "covered_attractions": ["故宫博物院"],
+          "avg_transit_min": 20
+        }
+      ],
+      "days": [
+        {
+          "day_index": 1,
+          "date": null,
+          "theme": "皇城中轴线",
+          "start_time": "09:00",
+          "end_time": "17:30",
+          "origin": {
+            "type": "recommended_area",
+            "poi_id": "map:wangfujing",
+            "name": "东单—王府井地铁站周边"
+          },
+          "outbound_route": {
+            "origin_poi_id": "map:wangfujing",
+            "destination_poi_id": "map:forbidden_city",
+            "recommended_mode": "公共交通",
+            "duration_min": 25,
+            "distance_km": 3.1,
+            "cost_cny": 4,
+            "walk_distance_m": 620,
+            "transfers": 0,
+            "reason": "公共交通耗时稳定，步行距离适中。"
+          },
+          "items": [
+            {
+              "item_id": "d1-i1",
+              "poi": {
+                "poi_id": "map:forbidden_city",
+                "canonical_name": "故宫博物院",
+                "map_source": "amap"
+              },
+              "start_time": "09:30",
+              "end_time": "15:30",
+              "stay_duration_min": 360,
+              "booking_reminder": "提前通过官方渠道预约门票。",
+              "entry_tip": "从午门进入，神武门出",
+              "route_from_previous": null,
+              "photo_spots": [
+                {
+                  "spot_id": "spot:forbidden-city:002",
+                  "poi_id": "map:forbidden_city",
+                  "spot_name": "太和门",
+                  "coordinate": {
+                    "latitude": 39.915098,
+                    "longitude": 116.397211,
+                    "coordinate_system": "GCJ-02"
+                  },
+                  "location_description": "太和门前金水桥附近。",
+                  "positioning_guide": "站在金水桥一侧，镜头朝向太和门。",
+                  "location_precision": "named_sub_poi",
+                  "reference_photos": [],
+                  "best_time": null,
+                  "source_refs": [],
+                  "ingestion_status": "auto_verified",
+                  "confidence": 0.9
+                }
+              ]
+            }
+          ],
+          "return_route": {
+            "origin_poi_id": "map:forbidden_city",
+            "destination_poi_id": "map:wangfujing",
+            "recommended_mode": "公共交通",
+            "duration_min": 25,
+            "distance_km": 3.1,
+            "cost_cny": 4,
+            "walk_distance_m": 620,
+            "transfers": 0,
+            "reason": "返回住宿区域方便休息和用餐。"
+          },
+          "summary": {
+            "estimated_duration_min": 510,
+            "dominant_transport_modes": ["步行", "公共交通"],
+            "estimated_walk_distance_m": 4800
+          }
+        }
+      ],
+      "limitations": [
+        {
+          "code": "date_pending",
+          "message": "日期待定，闭馆和预约信息需要在出发前再次确认。"
+        }
+      ],
+      "validation": {
+        "status": "pass",
+        "checks": [
+          {
+            "code": "date_pending",
+            "severity": "warning",
+            "message": "日期待定，开放时间仅按常规规则检查。",
+            "day_index": 1,
+            "item_id": null,
+            "spot_id": null
+          }
+        ],
+        "checked_at": "2026-08-21T10:03:00Z"
+      },
+      "planner": {
+        "model": "deepseek-chat",
+        "model_version": "2026-08",
+        "prompt_version": "planner-v1.2"
+      },
+      "generated_at": "2026-08-21T10:03:00Z"
+    },
+    "retrieval_run_ids": ["rr-example"],
+    "knowledge_index_version": "beijing-photo-spot-v1",
+    "created_at": "2026-08-21T10:03:00Z"
+  }
+}

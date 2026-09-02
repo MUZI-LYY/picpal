@@ -1,0 +1,777 @@
+{
+  "_meta": {
+    "说明": "公开快照仅保留结构化地点与机位描述，不包含采集来源或图片素材",
+    "review_status_default": "approved"
+  },
+  "photo_spots": [
+    {
+      "spot_id": "spot:forbidden-city:001",
+      "poi_id": "map:forbidden_city",
+      "spot_name": "右翼门",
+      "coordinate": {
+        "latitude": 39.916856,
+        "longitude": 116.395798,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "站在门框里，摄影师在外面拍剪影；故宫右翼门前；故宫右翼门处",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "人物",
+        "门框",
+        "建筑",
+        "后景"
+      ],
+      "visual_styles": [
+        "剪影",
+        "古今同框",
+        "长焦压缩空间",
+        "长焦",
+        "虚化前景"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.9,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:forbidden-city:002",
+      "poi_id": "map:forbidden_city",
+      "spot_name": "太和门",
+      "coordinate": {
+        "latitude": 39.915098,
+        "longitude": 116.397211,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "故宫太和门",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "石狮子",
+        "建筑"
+      ],
+      "visual_styles": [
+        "侧拍",
+        "仰拍",
+        "三分线构图"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.7,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:forbidden-city:003",
+      "poi_id": "map:forbidden_city",
+      "spot_name": "内金水桥",
+      "coordinate": {
+        "latitude": 39.9144,
+        "longitude": 116.397152,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "故宫内金水桥上",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "金水桥",
+        "建筑"
+      ],
+      "visual_styles": [
+        "引导线",
+        "前景"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.7,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:forbidden-city:004",
+      "poi_id": "map:forbidden_city",
+      "spot_name": "寿康门",
+      "coordinate": {
+        "latitude": 39.918923,
+        "longitude": 116.393572,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "故宫寿康门",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "人物",
+        "建筑"
+      ],
+      "visual_styles": [
+        "对称构图"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.7,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:forbidden-city:005",
+      "poi_id": "map:forbidden_city",
+      "spot_name": "天一门",
+      "coordinate": {
+        "latitude": 39.921471,
+        "longitude": 116.396849,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "故宫天一门",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "人物",
+        "建筑"
+      ],
+      "visual_styles": [
+        "居中对称构图"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.7,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:forbidden-city:006",
+      "poi_id": "map:forbidden_city",
+      "spot_name": "协和门",
+      "coordinate": {
+        "latitude": 39.914555,
+        "longitude": 116.398773,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "故宫协和门",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "游客",
+        "光影"
+      ],
+      "visual_styles": [
+        "竖构图",
+        "光影对比"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.7,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:forbidden-city:007",
+      "poi_id": "map:forbidden_city",
+      "spot_name": "体仁阁",
+      "coordinate": {
+        "latitude": 39.916364,
+        "longitude": 116.398475,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "故宫体仁阁附近",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "人物",
+        "太和殿"
+      ],
+      "visual_styles": [
+        "中长焦",
+        "三分线构图"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.7,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:jingshan:001",
+      "poi_id": "map:jingshan",
+      "spot_name": "周赏亭",
+      "coordinate": {
+        "latitude": 39.924587,
+        "longitude": 116.398472,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "万春亭右侧步道，用树木做前景框架",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "国贸CBD",
+        "树木框架"
+      ],
+      "visual_styles": [
+        "框架构图",
+        "现代与古典碰撞"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.7,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:jingshan:002",
+      "poi_id": "map:jingshan",
+      "spot_name": "富览亭",
+      "coordinate": {
+        "latitude": 39.924588,
+        "longitude": 116.394943,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "万春亭左侧步道，找一棵枝丫舒展的树框住白塔",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "北海白塔",
+        "树"
+      ],
+      "visual_styles": [
+        "古风",
+        "意境"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.7,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:jingshan:003",
+      "poi_id": "map:jingshan",
+      "spot_name": "辑芳亭",
+      "coordinate": {
+        "latitude": 39.92461,
+        "longitude": 116.395828,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "万春亭左侧步道，拍摄北海白塔+中央电视塔+远山同框",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "北海白塔",
+        "中央电视塔",
+        "远山"
+      ],
+      "visual_styles": [
+        "全景",
+        "日落",
+        "水墨画"
+      ],
+      "reference_photos": [],
+      "best_time": {
+        "type": "日落关联",
+        "display_text": "落日余晖",
+        "applicable_seasons": null,
+        "applicable_weather": null,
+        "source_ids": [],
+        "confidence": 0.6
+      },
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.7,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:jingshan:004",
+      "poi_id": "map:jingshan",
+      "spot_name": "寿皇殿",
+      "coordinate": {
+        "latitude": 39.927518,
+        "longitude": 116.396598,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "寿皇殿内及殿外古树",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "红墙古建",
+        "古树"
+      ],
+      "visual_styles": [
+        "古建筑",
+        "氛围感"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.7,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:jingshan:005",
+      "poi_id": "map:jingshan",
+      "spot_name": "观妙亭",
+      "coordinate": {
+        "latitude": 39.924613,
+        "longitude": 116.397681,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "景山公园半山腰观妙亭内",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "古建飞檐翘角",
+        "中国尊"
+      ],
+      "visual_styles": [
+        "古建与现代同框",
+        "自然光"
+      ],
+      "reference_photos": [],
+      "best_time": {
+        "type": "固定时段",
+        "display_text": "下午三四点光线最柔",
+        "applicable_seasons": null,
+        "applicable_weather": null,
+        "source_ids": [],
+        "confidence": 0.6
+      },
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.7,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:summer-palace:001",
+      "poi_id": "map:summer_palace",
+      "spot_name": "豳风桥",
+      "coordinate": {
+        "latitude": 39.996468,
+        "longitude": 116.267508,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "豳风桥；豳风桥附近；颐和园豳风桥；桥上",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "颐和园景色",
+        "晨景",
+        "佛香阁",
+        "树叶",
+        "桥",
+        "湖面",
+        "树影",
+        "远处建筑"
+      ],
+      "visual_styles": [
+        "画框构图",
+        "秋色",
+        "长焦",
+        "树叶前景",
+        "三分线构图",
+        "安静",
+        "远景"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.95,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:summer-palace:002",
+      "poi_id": "map:summer_palace",
+      "spot_name": "画中游",
+      "coordinate": {
+        "latitude": 39.998692,
+        "longitude": 116.27095,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "画中游；画中游区域",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "景色",
+        "亭台",
+        "廊道",
+        "假山",
+        "湖面",
+        "园林"
+      ],
+      "visual_styles": [
+        "秋色",
+        "中式园林",
+        "层次感",
+        "中式意境"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.9,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:summer-palace:003",
+      "poi_id": "map:summer_palace",
+      "spot_name": "十七孔桥",
+      "coordinate": {
+        "latitude": 39.990618,
+        "longitude": 116.277918,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "过十七孔桥后，左手边排队处；南湖岛十七孔桥上；桥上及周边",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "十七孔桥",
+        "人像",
+        "佛香阁",
+        "石像",
+        "小狮子",
+        "桥洞"
+      ],
+      "visual_styles": [
+        "古建筑",
+        "背光",
+        "长焦",
+        "压缩感",
+        "三分线构图",
+        "虚化前景",
+        "远景",
+        "侧面"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.9,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:summer-palace:004",
+      "poi_id": "map:summer_palace",
+      "spot_name": "排云殿",
+      "coordinate": {
+        "latitude": 39.998415,
+        "longitude": 116.274028,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "佛香阁排云殿",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "排云殿"
+      ],
+      "visual_styles": [],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.7,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:summer-palace:005",
+      "poi_id": "map:summer_palace",
+      "spot_name": "四大部洲",
+      "coordinate": {
+        "latitude": 40.000289,
+        "longitude": 116.274305,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "中间假山位置往日月殿方向；四大部洲，藏式宗教建筑群",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "日月殿",
+        "黄色琉璃瓦",
+        "红墙",
+        "台阶",
+        "藏式建筑"
+      ],
+      "visual_styles": [
+        "气势",
+        "古建",
+        "宗教建筑"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.8,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:summer-palace:006",
+      "poi_id": "map:summer_palace",
+      "spot_name": "知春亭",
+      "coordinate": {
+        "latitude": 39.99669,
+        "longitude": 116.279369,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "知春亭；知春亭，水面上有垂柳、游船",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "湖面",
+        "远山",
+        "古建",
+        "垂柳",
+        "游船"
+      ],
+      "visual_styles": [
+        "开阔",
+        "自然"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.8,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:summer-palace:007",
+      "poi_id": "map:summer_palace",
+      "spot_name": "石舫",
+      "coordinate": {
+        "latitude": 39.997867,
+        "longitude": 116.269843,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "石舫",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "石舫",
+        "湖面"
+      ],
+      "visual_styles": [
+        "古典"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.7,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:summer-palace:008",
+      "poi_id": "map:summer_palace",
+      "spot_name": "铜牛",
+      "coordinate": {
+        "latitude": 39.990712,
+        "longitude": 116.279448,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "铜牛处；铜牛，透过牛角看对岸的佛香阁",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "铜牛",
+        "昆明湖",
+        "十七孔桥",
+        "佛香阁"
+      ],
+      "visual_styles": [
+        "收尾",
+        "借景"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.8,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:summer-palace:009",
+      "poi_id": "map:summer_palace",
+      "spot_name": "南湖岛",
+      "coordinate": {
+        "latitude": 39.991418,
+        "longitude": 116.276021,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "南湖岛",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "彩虹"
+      ],
+      "visual_styles": [
+        "自然"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.7,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:temple-of-heaven:001",
+      "poi_id": "map:temple_of_heaven",
+      "spot_name": "祈年殿西配殿",
+      "coordinate": {
+        "latitude": 39.882982,
+        "longitude": 116.412321,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "天坛祈年殿西配殿",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "祈年殿"
+      ],
+      "visual_styles": [
+        "利用柱子形成前景和层次"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.7,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:temple-of-heaven:002",
+      "poi_id": "map:temple_of_heaven",
+      "spot_name": "双环万寿亭",
+      "coordinate": {
+        "latitude": 39.883629,
+        "longitude": 116.406883,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "天坛双环万寿亭；对面亭子，用长亭门框做前景",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "长廊",
+        "双环万寿亭"
+      ],
+      "visual_styles": [
+        "长焦压缩空间",
+        "节奏秩序",
+        "层次感",
+        "框景"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.8,
+      "last_checked_at": "2026-08-19"
+    },
+    {
+      "spot_id": "spot:temple-of-heaven:003",
+      "poi_id": "map:temple_of_heaven",
+      "spot_name": "七十二长廊",
+      "coordinate": {
+        "latitude": 39.883708,
+        "longitude": 116.416242,
+        "coordinate_system": "GCJ-02"
+      },
+      "location_description": "七十二长廊内",
+      "location_precision": "named_sub_poi",
+      "photo_subjects": [
+        "长廊",
+        "绿荫"
+      ],
+      "visual_styles": [
+        "光影",
+        "春意"
+      ],
+      "reference_photos": [],
+      "best_time": null,
+      "source_refs": [],
+      "ingestion_status": "auto_verified",
+      "admission_evidence": [
+        "explicit_location",
+        "map_unique_match"
+      ],
+      "confidence": 0.7,
+      "last_checked_at": "2026-08-19"
+    }
+  ]
+}

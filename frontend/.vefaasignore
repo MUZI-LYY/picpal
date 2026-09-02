@@ -1,0 +1,2 @@
+# 输出目录 .next/standalone 里都是必需文件（含 bundled node_modules），不要排除。
+.vefaas/

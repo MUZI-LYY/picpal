@@ -1,0 +1,14 @@
+{
+  "data": [
+    {
+      "spot_id": "spot:forbidden-city:002",
+      "poi_id": "map:forbidden_city",
+      "poi_name": "故宫博物院",
+      "spot_name": "太和门",
+      "cover_image": null,
+      "location_description": "太和门前金水桥附近。",
+      "best_time": null,
+      "source": null
+    }
+  ]
+}

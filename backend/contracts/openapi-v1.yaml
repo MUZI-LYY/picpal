@@ -1,0 +1,1284 @@
+openapi: 3.1.0
+jsonSchemaDialect: https://json-schema.org/draft/2020-12/schema
+info:
+  title: 北京 AI 旅行规划助手 API
+  version: 1.0.0
+  description: |
+    正式对话式 MVP 的唯一 HTTP 契约。所有 ID 都是不透明字符串；客户端不得解析 ID。
+    日期时间统一使用 UTC ISO 8601。旧版 /api/v1/trips 暂时保留，但不属于本契约。
+servers:
+  - url: /
+    description: 通过正式前端同源代理访问
+tags:
+  - name: Conversations
+  - name: Runs
+  - name: Plans
+  - name: PhotoSpots
+  - name: System
+
+paths:
+  /api/v1/conversations:
+    post:
+      tags: [Conversations]
+      operationId: createConversation
+      summary: 用第一条用户消息创建对话
+      description: |
+        不创建空对话。若没有匿名会话 Cookie，服务端创建会话并通过 HttpOnly Cookie 返回。
+        相同 Idempotency-Key 和 client_message_id 的安全重试必须返回第一次结果。
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConversationRequest'
+      responses:
+        '201':
+          description: 对话和首轮消息已创建
+          headers:
+            Location:
+              description: 新 Conversation 的 API 地址
+              schema: {type: string}
+            Set-Cookie:
+              description: 没有匿名会话时设置 HttpOnly trip_session Cookie
+              schema: {type: string}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationTurnResponse'
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '409': {$ref: '#/components/responses/Conflict'}
+        '422': {$ref: '#/components/responses/ValidationError'}
+        '429': {$ref: '#/components/responses/RateLimited'}
+        '502': {$ref: '#/components/responses/UpstreamFailure'}
+        '503': {$ref: '#/components/responses/ServiceUnavailable'}
+        '500': {$ref: '#/components/responses/InternalError'}
+    get:
+      tags: [Conversations]
+      operationId: listConversations
+      summary: 获取当前匿名用户的历史对话
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/ConversationLimit'
+      responses:
+        '200':
+          description: 按 updated_at 和 id 倒序返回的历史对话
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationListResponse'
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '429': {$ref: '#/components/responses/RateLimited'}
+        '500': {$ref: '#/components/responses/InternalError'}
+
+  /api/v1/conversations/{conversation_id}:
+    get:
+      tags: [Conversations]
+      operationId: getConversation
+      summary: 恢复对话页面所需的聚合快照
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ConversationId'
+      responses:
+        '200':
+          description: 最新 50 条消息、active Run 和最新有效 Plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationSnapshotResponse'
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+
+  /api/v1/conversations/{conversation_id}/messages:
+    post:
+      tags: [Conversations]
+      operationId: createConversationMessage
+      summary: 回答追问或基于当前行程提出修改
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ConversationId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMessageRequest'
+      responses:
+        '201':
+          description: 用户消息已保存，并返回本轮 assistant 消息及可能创建的 Run
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationTurnResponse'
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '409': {$ref: '#/components/responses/Conflict'}
+        '422': {$ref: '#/components/responses/ValidationError'}
+        '429': {$ref: '#/components/responses/RateLimited'}
+        '502': {$ref: '#/components/responses/UpstreamFailure'}
+        '503': {$ref: '#/components/responses/ServiceUnavailable'}
+        '500': {$ref: '#/components/responses/InternalError'}
+    get:
+      tags: [Conversations]
+      operationId: listConversationMessages
+      summary: 向前分页加载更早消息
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ConversationId'
+        - $ref: '#/components/parameters/BeforeCursor'
+        - $ref: '#/components/parameters/MessageLimit'
+      responses:
+        '200':
+          description: 按时间正序返回的一页消息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageListResponse'
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+
+  /api/v1/runs/{run_id}:
+    get:
+      tags: [Runs]
+      operationId: getRun
+      summary: 查询首次生成或修改任务的真实状态
+      description: Run 已接受后的上游失败通过 status=failed 和 error 表达，本接口仍返回 200。
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+      responses:
+        '200':
+          description: Run 当前状态
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunResponse'
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+
+  /api/v1/plans/{plan_id}:
+    get:
+      tags: [Plans]
+      operationId: getPlan
+      summary: 获取指定的不可变行程版本
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PlanId'
+      responses:
+        '200':
+          description: 指定 PlanVersion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanVersionResponse'
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+
+  /api/v1/photo-spots/featured:
+    get:
+      tags: [PhotoSpots]
+      operationId: listFeaturedPhotoSpots
+      summary: 获取首页北京出片灵感
+      security: []
+      parameters:
+        - name: city
+          in: query
+          required: false
+          schema:
+            type: string
+            const: 北京
+            default: 北京
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10
+            default: 5
+      responses:
+        '200':
+          description: 只包含已准入、来源完整的精选机位
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeaturedPhotoSpotListResponse'
+        '422': {$ref: '#/components/responses/ValidationError'}
+        '500': {$ref: '#/components/responses/InternalError'}
+
+  /api/v1/health:
+    get:
+      tags: [System]
+      operationId: getHealth
+      summary: 健康检查
+      security: []
+      responses:
+        '200':
+          description: 服务正常
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: trip_session
+
+  parameters:
+    ConversationId:
+      name: conversation_id
+      in: path
+      required: true
+      schema: {$ref: '#/components/schemas/OpaqueId'}
+    RunId:
+      name: run_id
+      in: path
+      required: true
+      schema: {$ref: '#/components/schemas/OpaqueId'}
+    PlanId:
+      name: plan_id
+      in: path
+      required: true
+      schema: {$ref: '#/components/schemas/OpaqueId'}
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: 网络重试时必须复用同一个 UUID
+      schema:
+        type: string
+        format: uuid
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      schema: {type: [string, 'null']}
+    BeforeCursor:
+      name: before
+      in: query
+      required: false
+      schema: {type: [string, 'null']}
+    ConversationLimit:
+      name: limit
+      in: query
+      required: false
+      schema: {type: integer, minimum: 1, maximum: 50, default: 20}
+    MessageLimit:
+      name: limit
+      in: query
+      required: false
+      schema: {type: integer, minimum: 1, maximum: 100, default: 50}
+
+  responses:
+    BadRequest:
+      description: JSON 格式错误或缺少必要请求信息
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiErrorResponse'}
+    Unauthorized:
+      description: 缺少或无法验证匿名会话
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiErrorResponse'}
+    NotFound:
+      description: 资源不存在或不属于当前匿名用户
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiErrorResponse'}
+    Conflict:
+      description: 正在运行、版本过期、重复回答或幂等冲突
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiErrorResponse'}
+    ValidationError:
+      description: 请求可解析但字段或业务语义无效
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiErrorResponse'}
+    RateLimited:
+      description: 请求频率超过限制
+      headers:
+        Retry-After:
+          schema: {type: integer, minimum: 1}
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiErrorResponse'}
+    UpstreamFailure:
+      description: 在形成可轮询 Run 之前发生的同步模型、地图或 RAG 上游失败
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiErrorResponse'}
+    ServiceUnavailable:
+      description: 服务暂时不可用
+      headers:
+        Retry-After:
+          schema: {type: integer, minimum: 1}
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiErrorResponse'}
+    InternalError:
+      description: 未预期错误，不返回内部堆栈
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiErrorResponse'}
+
+  schemas:
+    OpaqueId:
+      type: string
+      minLength: 1
+      maxLength: 128
+      description: 不透明字符串 ID；消费者不得依赖前缀或把它转为数字。
+
+    NullableOpaqueId:
+      anyOf:
+        - $ref: '#/components/schemas/OpaqueId'
+        - type: 'null'
+
+    CreateConversationRequest:
+      type: object
+      additionalProperties: false
+      required: [client_message_id, text]
+      properties:
+        client_message_id: {$ref: '#/components/schemas/OpaqueId'}
+        text:
+          type: string
+          minLength: 1
+          maxLength: 4000
+
+    CreateMessageRequest:
+      type: object
+      additionalProperties: false
+      required: [client_message_id, text, reply_to_message_id, structured_answer, base_plan_id]
+      properties:
+        client_message_id: {$ref: '#/components/schemas/OpaqueId'}
+        text:
+          type: string
+          minLength: 1
+          maxLength: 4000
+        reply_to_message_id: {$ref: '#/components/schemas/NullableOpaqueId'}
+        structured_answer:
+          anyOf:
+            - $ref: '#/components/schemas/StructuredAnswer'
+            - type: 'null'
+        base_plan_id: {$ref: '#/components/schemas/NullableOpaqueId'}
+
+    StructuredAnswer:
+      oneOf:
+        - $ref: '#/components/schemas/DaysAnswer'
+        - $ref: '#/components/schemas/StartDateAnswer'
+        - $ref: '#/components/schemas/PaceAnswer'
+      discriminator:
+        propertyName: slot
+        mapping:
+          days: '#/components/schemas/DaysAnswer'
+          start_date: '#/components/schemas/StartDateAnswer'
+          pace: '#/components/schemas/PaceAnswer'
+
+    DaysAnswer:
+      type: object
+      additionalProperties: false
+      required: [slot, value]
+      properties:
+        slot: {type: string, const: days}
+        value: {type: integer, enum: [1, 2, 3, 4, 5]}
+
+    StartDateAnswer:
+      type: object
+      additionalProperties: false
+      required: [slot, value]
+      properties:
+        slot: {type: string, const: start_date}
+        value:
+          oneOf:
+            - type: string
+              format: date
+            - type: string
+              const: pending
+
+    PaceAnswer:
+      type: object
+      additionalProperties: false
+      required: [slot, value]
+      properties:
+        slot: {type: string, const: pace}
+        value: {type: string, enum: [轻松, 适中, 紧凑]}
+
+    ConversationStatus:
+      type: string
+      enum: [collecting_requirements, generating, completed, failed, archived]
+
+    RequirementsSnapshot:
+      type: object
+      additionalProperties: false
+      required:
+        - city
+        - days
+        - date_status
+        - start_date
+        - party_size
+        - companion_types
+        - must_include
+        - must_exclude
+        - interests
+        - photo_preferences
+        - pace
+        - lodging_text
+        - transport_preferences
+        - missing_slots
+      properties:
+        city: {type: string, const: 北京}
+        days: {type: [integer, 'null'], minimum: 1, maximum: 5}
+        date_status: {type: string, enum: [unknown, specified, pending]}
+        start_date: {type: [string, 'null'], format: date}
+        party_size: {type: [integer, 'null'], minimum: 1}
+        companion_types:
+          type: array
+          items: {type: string}
+        must_include:
+          type: array
+          items: {type: string}
+        must_exclude:
+          type: array
+          items: {type: string}
+        interests:
+          type: array
+          items: {type: string}
+        photo_preferences:
+          type: array
+          items: {type: string}
+        pace:
+          type: [string, 'null']
+          enum: [轻松, 适中, 紧凑, null]
+        lodging_text: {type: [string, 'null'], maxLength: 500}
+        transport_preferences:
+          type: array
+          items: {type: string}
+        missing_slots:
+          type: array
+          uniqueItems: true
+          items: {type: string, enum: [days, start_date, pace]}
+      allOf:
+        - if:
+            properties: {date_status: {const: specified}}
+          then:
+            properties: {start_date: {type: string, format: date}}
+        - if:
+            properties: {date_status: {enum: [unknown, pending]}}
+          then:
+            properties: {start_date: {type: 'null'}}
+
+    Conversation:
+      type: object
+      additionalProperties: false
+      required: [id, title, status, requirements, latest_plan_id, active_run_id, created_at, updated_at]
+      properties:
+        id: {$ref: '#/components/schemas/OpaqueId'}
+        title: {type: string, minLength: 1, maxLength: 200}
+        status: {$ref: '#/components/schemas/ConversationStatus'}
+        requirements: {$ref: '#/components/schemas/RequirementsSnapshot'}
+        latest_plan_id: {$ref: '#/components/schemas/NullableOpaqueId'}
+        active_run_id: {$ref: '#/components/schemas/NullableOpaqueId'}
+        created_at: {type: string, format: date-time}
+        updated_at: {type: string, format: date-time}
+      allOf:
+        - if:
+            properties: {status: {const: generating}}
+          then:
+            properties: {active_run_id: {$ref: '#/components/schemas/OpaqueId'}}
+        - if:
+            properties: {status: {const: completed}}
+          then:
+            properties: {latest_plan_id: {$ref: '#/components/schemas/OpaqueId'}}
+        - if:
+            properties: {status: {const: collecting_requirements}}
+          then:
+            properties: {active_run_id: {type: 'null'}}
+
+    ConversationSummary:
+      type: object
+      additionalProperties: false
+      required: [id, title, preview, status, latest_plan_id, updated_at]
+      properties:
+        id: {$ref: '#/components/schemas/OpaqueId'}
+        title: {type: string, minLength: 1, maxLength: 200}
+        preview: {type: string, maxLength: 300}
+        status: {$ref: '#/components/schemas/ConversationStatus'}
+        latest_plan_id: {$ref: '#/components/schemas/NullableOpaqueId'}
+        updated_at: {type: string, format: date-time}
+
+    MessageRole:
+      type: string
+      enum: [user, assistant, system]
+
+    MessageContentType:
+      type: string
+      enum: [text, clarification, run_started, plan_created, plan_updated, error]
+
+    ClarificationOption:
+      type: object
+      additionalProperties: false
+      required: [label, value]
+      properties:
+        label: {type: string, minLength: 1}
+        value:
+          oneOf:
+            - type: integer
+            - type: string
+
+    ClarificationContent:
+      type: object
+      additionalProperties: false
+      required: [kind, slot, control, options, allow_pending]
+      properties:
+        kind: {type: string, const: clarification}
+        slot: {type: string, enum: [days, start_date, pace]}
+        control: {type: string, enum: [single_select, date_or_pending]}
+        options:
+          type: array
+          items: {$ref: '#/components/schemas/ClarificationOption'}
+        allow_pending: {type: boolean}
+
+    RunStartedContent:
+      type: object
+      additionalProperties: false
+      required: [kind, run_id]
+      properties:
+        kind: {type: string, const: run_started}
+        run_id: {$ref: '#/components/schemas/OpaqueId'}
+
+    PlanEventContent:
+      type: object
+      additionalProperties: false
+      required: [kind, plan_id, version, changed_days, change_summary]
+      properties:
+        kind: {type: string, enum: [plan_created, plan_updated]}
+        plan_id: {$ref: '#/components/schemas/OpaqueId'}
+        version: {type: integer, minimum: 1}
+        changed_days:
+          type: array
+          items: {type: integer, minimum: 1, maximum: 5}
+        change_summary:
+          type: array
+          items: {type: string}
+
+    ErrorMessageContent:
+      type: object
+      additionalProperties: false
+      required: [kind, code, recoverable]
+      properties:
+        kind: {type: string, const: error}
+        code: {type: string, minLength: 1}
+        recoverable: {type: boolean}
+
+    MessageStructuredContent:
+      oneOf:
+        - $ref: '#/components/schemas/ClarificationContent'
+        - $ref: '#/components/schemas/RunStartedContent'
+        - $ref: '#/components/schemas/PlanEventContent'
+        - $ref: '#/components/schemas/ErrorMessageContent'
+
+    Message:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - conversation_id
+        - role
+        - content_type
+        - text
+        - structured_content
+        - reply_to_message_id
+        - run_id
+        - plan_id
+        - created_at
+      properties:
+        id: {$ref: '#/components/schemas/OpaqueId'}
+        conversation_id: {$ref: '#/components/schemas/OpaqueId'}
+        role: {$ref: '#/components/schemas/MessageRole'}
+        content_type: {$ref: '#/components/schemas/MessageContentType'}
+        text: {type: string, maxLength: 8000}
+        structured_content:
+          anyOf:
+            - $ref: '#/components/schemas/MessageStructuredContent'
+            - type: 'null'
+        reply_to_message_id: {$ref: '#/components/schemas/NullableOpaqueId'}
+        run_id: {$ref: '#/components/schemas/NullableOpaqueId'}
+        plan_id: {$ref: '#/components/schemas/NullableOpaqueId'}
+        created_at: {type: string, format: date-time}
+      allOf:
+        - if:
+            properties: {content_type: {const: text}}
+          then:
+            properties: {structured_content: {type: 'null'}}
+        - if:
+            properties: {content_type: {const: clarification}}
+          then:
+            properties: {structured_content: {$ref: '#/components/schemas/ClarificationContent'}}
+        - if:
+            properties: {content_type: {const: run_started}}
+          then:
+            properties: {structured_content: {$ref: '#/components/schemas/RunStartedContent'}}
+        - if:
+            properties: {content_type: {enum: [plan_created, plan_updated]}}
+          then:
+            properties: {structured_content: {$ref: '#/components/schemas/PlanEventContent'}}
+        - if:
+            properties: {content_type: {const: error}}
+          then:
+            properties: {structured_content: {$ref: '#/components/schemas/ErrorMessageContent'}}
+
+    RunKind:
+      type: string
+      enum: [initial_plan, revision]
+
+    RunStatus:
+      type: string
+      enum: [queued, running, succeeded, failed]
+
+    RunStageStatus:
+      type: string
+      enum: [waiting, running, succeeded, failed, skipped]
+
+    RunStage:
+      type: object
+      additionalProperties: false
+      required: [key, label, status, started_at, completed_at]
+      properties:
+        key:
+          type: string
+          enum:
+            - understanding_request
+            - resolving_pois
+            - planning_routes
+            - recommending_lodging
+            - retrieving_photo_spots
+            - validating
+        label: {type: string, minLength: 1}
+        status: {$ref: '#/components/schemas/RunStageStatus'}
+        started_at: {type: [string, 'null'], format: date-time}
+        completed_at: {type: [string, 'null'], format: date-time}
+
+    RunError:
+      type: object
+      additionalProperties: false
+      required: [code, message, recoverable]
+      properties:
+        code: {type: string, minLength: 1}
+        message: {type: string, minLength: 1}
+        recoverable: {type: boolean}
+
+    Run:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - conversation_id
+        - kind
+        - status
+        - trigger_message_id
+        - base_plan_id
+        - result_plan_id
+        - current_stage
+        - stages
+        - error
+        - created_at
+        - started_at
+        - finished_at
+      properties:
+        id: {$ref: '#/components/schemas/OpaqueId'}
+        conversation_id: {$ref: '#/components/schemas/OpaqueId'}
+        kind: {$ref: '#/components/schemas/RunKind'}
+        status: {$ref: '#/components/schemas/RunStatus'}
+        trigger_message_id: {$ref: '#/components/schemas/OpaqueId'}
+        base_plan_id: {$ref: '#/components/schemas/NullableOpaqueId'}
+        result_plan_id: {$ref: '#/components/schemas/NullableOpaqueId'}
+        current_stage:
+          type: [string, 'null']
+          enum:
+            - understanding_request
+            - resolving_pois
+            - planning_routes
+            - recommending_lodging
+            - retrieving_photo_spots
+            - validating
+            - null
+        stages:
+          type: array
+          maxItems: 6
+          items: {$ref: '#/components/schemas/RunStage'}
+        error:
+          anyOf:
+            - $ref: '#/components/schemas/RunError'
+            - type: 'null'
+        created_at: {type: string, format: date-time}
+        started_at: {type: [string, 'null'], format: date-time}
+        finished_at: {type: [string, 'null'], format: date-time}
+      allOf:
+        - if:
+            properties: {status: {const: queued}}
+          then:
+            properties:
+              started_at: {type: 'null'}
+              finished_at: {type: 'null'}
+              error: {type: 'null'}
+        - if:
+            properties: {status: {const: running}}
+          then:
+            properties:
+              started_at: {type: string, format: date-time}
+              finished_at: {type: 'null'}
+              error: {type: 'null'}
+        - if:
+            properties: {status: {const: succeeded}}
+          then:
+            properties:
+              result_plan_id: {$ref: '#/components/schemas/OpaqueId'}
+              error: {type: 'null'}
+              finished_at: {type: string, format: date-time}
+        - if:
+            properties: {status: {const: failed}}
+          then:
+            properties:
+              error: {$ref: '#/components/schemas/RunError'}
+              finished_at: {type: string, format: date-time}
+
+    Coordinate:
+      type: object
+      additionalProperties: false
+      required: [latitude, longitude, coordinate_system]
+      properties:
+        latitude: {type: number, minimum: -90, maximum: 90}
+        longitude: {type: number, minimum: -180, maximum: 180}
+        coordinate_system: {type: string, enum: [GCJ-02, WGS-84, BD-09]}
+
+    POI:
+      type: object
+      additionalProperties: false
+      required: [poi_id, canonical_name, map_source]
+      properties:
+        poi_id: {$ref: '#/components/schemas/OpaqueId'}
+        canonical_name: {type: string, minLength: 1}
+        map_source: {type: [string, 'null']}
+
+    RouteSegment:
+      type: object
+      additionalProperties: false
+      required:
+        - origin_poi_id
+        - destination_poi_id
+        - recommended_mode
+        - duration_min
+        - distance_km
+        - cost_cny
+        - walk_distance_m
+        - transfers
+        - reason
+      properties:
+        origin_poi_id: {$ref: '#/components/schemas/OpaqueId'}
+        destination_poi_id: {$ref: '#/components/schemas/OpaqueId'}
+        recommended_mode: {type: string, enum: [步行, 公共交通, 打车, 驾车]}
+        duration_min: {type: integer, minimum: 0}
+        distance_km: {type: number, minimum: 0}
+        cost_cny: {type: [number, 'null'], minimum: 0}
+        walk_distance_m: {type: [integer, 'null'], minimum: 0}
+        transfers: {type: [integer, 'null'], minimum: 0}
+        reason: {type: string, minLength: 1}
+
+    ReferencePhoto:
+      type: object
+      additionalProperties: false
+      required: [image_id, storage_url, thumbnail_url, source_id]
+      properties:
+        image_id: {$ref: '#/components/schemas/OpaqueId'}
+        storage_url: {type: string, format: uri}
+        thumbnail_url: {type: [string, 'null'], format: uri}
+        source_id: {$ref: '#/components/schemas/OpaqueId'}
+
+    SourceRef:
+      type: object
+      additionalProperties: false
+      required: [source_id, source_platform, source_author, source_url, evidence_ids]
+      properties:
+        source_id: {$ref: '#/components/schemas/OpaqueId'}
+        source_platform: {type: string, minLength: 1}
+        source_author: {type: [string, 'null']}
+        source_url: {type: string, format: uri}
+        evidence_ids:
+          type: array
+          items: {$ref: '#/components/schemas/OpaqueId'}
+
+    BestTime:
+      type: object
+      additionalProperties: false
+      required: [type, display_text, applicable_seasons, applicable_weather, source_ids, confidence]
+      properties:
+        type: {type: string, enum: [固定时段, 日出关联, 日落关联, 亮灯后, 季节性]}
+        display_text: {type: string, minLength: 1}
+        applicable_seasons:
+          type: [array, 'null']
+          items: {type: string}
+        applicable_weather:
+          type: [array, 'null']
+          items: {type: string}
+        source_ids:
+          type: array
+          items: {$ref: '#/components/schemas/OpaqueId'}
+        confidence: {type: number, minimum: 0, maximum: 1}
+
+    PhotoSpotHit:
+      type: object
+      additionalProperties: false
+      required:
+        - spot_id
+        - poi_id
+        - spot_name
+        - coordinate
+        - location_description
+        - positioning_guide
+        - location_precision
+        - reference_photos
+        - best_time
+        - source_refs
+        - ingestion_status
+        - confidence
+      properties:
+        spot_id: {$ref: '#/components/schemas/OpaqueId'}
+        poi_id: {$ref: '#/components/schemas/OpaqueId'}
+        spot_name: {type: string, minLength: 1}
+        coordinate: {$ref: '#/components/schemas/Coordinate'}
+        location_description: {type: string, minLength: 1}
+        positioning_guide: {type: [string, 'null']}
+        location_precision: {type: string, enum: [exact_poi, named_sub_poi, approximate]}
+        reference_photos:
+          type: array
+          items: {$ref: '#/components/schemas/ReferencePhoto'}
+        best_time:
+          anyOf:
+            - $ref: '#/components/schemas/BestTime'
+            - type: 'null'
+        source_refs:
+          type: array
+          items: {$ref: '#/components/schemas/SourceRef'}
+        ingestion_status: {type: string, const: auto_verified}
+        confidence: {type: number, minimum: 0, maximum: 1}
+
+    ItineraryItem:
+      type: object
+      additionalProperties: false
+      required:
+        - item_id
+        - poi
+        - start_time
+        - end_time
+        - stay_duration_min
+        - booking_reminder
+        - entry_tip
+        - route_from_previous
+        - photo_spots
+      properties:
+        item_id: {$ref: '#/components/schemas/OpaqueId'}
+        poi: {$ref: '#/components/schemas/POI'}
+        start_time: {type: [string, 'null'], pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'}
+        end_time: {type: [string, 'null'], pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'}
+        stay_duration_min: {type: integer, minimum: 0}
+        booking_reminder: {type: [string, 'null']}
+        entry_tip: {type: [string, 'null']}
+        route_from_previous:
+          anyOf:
+            - $ref: '#/components/schemas/RouteSegment'
+            - type: 'null'
+        photo_spots:
+          type: array
+          items: {$ref: '#/components/schemas/PhotoSpotHit'}
+
+    DayOrigin:
+      type: object
+      additionalProperties: false
+      required: [type, poi_id, name]
+      properties:
+        type: {type: string, enum: [user_lodging, recommended_area]}
+        poi_id: {$ref: '#/components/schemas/OpaqueId'}
+        name: {type: string, minLength: 1}
+
+    ItineraryDaySummary:
+      type: object
+      additionalProperties: false
+      required: [estimated_duration_min, dominant_transport_modes, estimated_walk_distance_m]
+      properties:
+        estimated_duration_min: {type: integer, minimum: 0}
+        dominant_transport_modes:
+          type: array
+          uniqueItems: true
+          items: {type: string, enum: [步行, 公共交通, 打车, 驾车]}
+        estimated_walk_distance_m: {type: [integer, 'null'], minimum: 0}
+
+    ItineraryDay:
+      type: object
+      additionalProperties: false
+      required:
+        - day_index
+        - date
+        - theme
+        - start_time
+        - end_time
+        - origin
+        - outbound_route
+        - items
+        - return_route
+        - summary
+      properties:
+        day_index: {type: integer, minimum: 1, maximum: 5}
+        date: {type: [string, 'null'], format: date}
+        theme: {type: [string, 'null']}
+        start_time: {type: [string, 'null'], pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'}
+        end_time: {type: [string, 'null'], pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'}
+        origin: {$ref: '#/components/schemas/DayOrigin'}
+        outbound_route:
+          anyOf:
+            - $ref: '#/components/schemas/RouteSegment'
+            - type: 'null'
+        items:
+          type: array
+          minItems: 1
+          items: {$ref: '#/components/schemas/ItineraryItem'}
+        return_route:
+          anyOf:
+            - $ref: '#/components/schemas/RouteSegment'
+            - type: 'null'
+        summary: {$ref: '#/components/schemas/ItineraryDaySummary'}
+
+    LodgingRecommendation:
+      type: object
+      additionalProperties: false
+      required: [area_id, name, level, representative_station, reason, covered_attractions, avg_transit_min]
+      properties:
+        area_id: {$ref: '#/components/schemas/OpaqueId'}
+        name: {type: string, minLength: 1}
+        level: {type: string, enum: [首选, 备选, 当前住宿评估]}
+        representative_station: {type: [string, 'null']}
+        reason: {type: string, minLength: 1}
+        covered_attractions:
+          type: array
+          items: {type: string}
+        avg_transit_min: {type: [integer, 'null'], minimum: 0}
+
+    Limitation:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code: {type: string, minLength: 1}
+        message: {type: string, minLength: 1}
+
+    ValidationCheck:
+      type: object
+      additionalProperties: false
+      required: [code, severity, message, day_index, item_id, spot_id]
+      properties:
+        code: {type: string, minLength: 1}
+        severity: {type: string, enum: [fail, warning, spot_fail]}
+        message: {type: string, minLength: 1}
+        day_index: {type: [integer, 'null'], minimum: 1, maximum: 5}
+        item_id: {$ref: '#/components/schemas/NullableOpaqueId'}
+        spot_id: {$ref: '#/components/schemas/NullableOpaqueId'}
+
+    ValidationResult:
+      type: object
+      additionalProperties: false
+      required: [status, checks, checked_at]
+      properties:
+        status: {type: string, enum: [pass, fail]}
+        checks:
+          type: array
+          items: {$ref: '#/components/schemas/ValidationCheck'}
+        checked_at: {type: string, format: date-time}
+
+    PlannerInfo:
+      type: object
+      additionalProperties: false
+      required: [model, model_version, prompt_version]
+      properties:
+        model: {type: [string, 'null']}
+        model_version: {type: [string, 'null']}
+        prompt_version: {type: string, minLength: 1}
+
+    ItineraryPlan:
+      type: object
+      additionalProperties: false
+      required:
+        - schema_version
+        - plan_id
+        - request_id
+        - status
+        - title
+        - overview
+        - request_summary
+        - lodging_recommendations
+        - days
+        - limitations
+        - validation
+        - planner
+        - generated_at
+      properties:
+        schema_version: {type: string, const: 1.2.0}
+        plan_id: {$ref: '#/components/schemas/OpaqueId'}
+        request_id: {$ref: '#/components/schemas/OpaqueId'}
+        status: {type: string, const: validated}
+        title: {type: string, minLength: 1}
+        overview: {type: string}
+        request_summary: {type: object, additionalProperties: true}
+        lodging_recommendations:
+          type: array
+          minItems: 1
+          items: {$ref: '#/components/schemas/LodgingRecommendation'}
+        days:
+          type: array
+          minItems: 1
+          maxItems: 3
+          items: {$ref: '#/components/schemas/ItineraryDay'}
+        limitations:
+          type: array
+          items: {$ref: '#/components/schemas/Limitation'}
+        validation: {$ref: '#/components/schemas/ValidationResult'}
+        planner: {$ref: '#/components/schemas/PlannerInfo'}
+        generated_at: {type: string, format: date-time}
+
+    PlanVersion:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - conversation_id
+        - run_id
+        - version
+        - base_plan_id
+        - status
+        - changed_days
+        - change_summary
+        - plan
+        - retrieval_run_ids
+        - knowledge_index_version
+        - created_at
+      properties:
+        id: {$ref: '#/components/schemas/OpaqueId'}
+        conversation_id: {$ref: '#/components/schemas/OpaqueId'}
+        run_id: {$ref: '#/components/schemas/OpaqueId'}
+        version: {type: integer, minimum: 1}
+        base_plan_id: {$ref: '#/components/schemas/NullableOpaqueId'}
+        status: {type: string, const: validated}
+        changed_days:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: {type: integer, minimum: 1, maximum: 5}
+        change_summary:
+          type: array
+          items: {type: string}
+        plan: {$ref: '#/components/schemas/ItineraryPlan'}
+        retrieval_run_ids:
+          type: array
+          items: {$ref: '#/components/schemas/OpaqueId'}
+        knowledge_index_version: {type: string, minLength: 1}
+        created_at: {type: string, format: date-time}
+
+    ConversationTurnData:
+      type: object
+      additionalProperties: false
+      required: [conversation, accepted_message, assistant_messages, active_run, latest_plan]
+      properties:
+        conversation: {$ref: '#/components/schemas/Conversation'}
+        accepted_message: {$ref: '#/components/schemas/Message'}
+        assistant_messages:
+          type: array
+          minItems: 1
+          items: {$ref: '#/components/schemas/Message'}
+        active_run:
+          anyOf:
+            - $ref: '#/components/schemas/Run'
+            - type: 'null'
+        latest_plan:
+          anyOf:
+            - $ref: '#/components/schemas/PlanVersion'
+            - type: 'null'
+
+    ConversationTurnResponse:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data: {$ref: '#/components/schemas/ConversationTurnData'}
+
+    ConversationSnapshotData:
+      type: object
+      additionalProperties: false
+      required: [conversation, messages, message_page, active_run, latest_plan]
+      properties:
+        conversation: {$ref: '#/components/schemas/Conversation'}
+        messages:
+          type: array
+          items: {$ref: '#/components/schemas/Message'}
+        message_page: {$ref: '#/components/schemas/BackwardPageMeta'}
+        active_run:
+          anyOf:
+            - $ref: '#/components/schemas/Run'
+            - type: 'null'
+        latest_plan:
+          anyOf:
+            - $ref: '#/components/schemas/PlanVersion'
+            - type: 'null'
+
+    ConversationSnapshotResponse:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data: {$ref: '#/components/schemas/ConversationSnapshotData'}
+
+    ForwardPageMeta:
+      type: object
+      additionalProperties: false
+      required: [has_next, next_cursor]
+      properties:
+        has_next: {type: boolean}
+        next_cursor: {type: [string, 'null']}
+
+    BackwardPageMeta:
+      type: object
+      additionalProperties: false
+      required: [has_more, before_cursor]
+      properties:
+        has_more: {type: boolean}
+        before_cursor: {type: [string, 'null']}
+
+    ConversationListResponse:
+      type: object
+      additionalProperties: false
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items: {$ref: '#/components/schemas/ConversationSummary'}
+        meta: {$ref: '#/components/schemas/ForwardPageMeta'}
+
+    MessageListResponse:
+      type: object
+      additionalProperties: false
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items: {$ref: '#/components/schemas/Message'}
+        meta: {$ref: '#/components/schemas/BackwardPageMeta'}
+
+    RunResponse:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data: {$ref: '#/components/schemas/Run'}
+
+    PlanVersionResponse:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data: {$ref: '#/components/schemas/PlanVersion'}
+
+    FeaturedPhotoSpot:
+      type: object
+      additionalProperties: false
+      required:
+        - spot_id
+        - poi_id
+        - poi_name
+        - spot_name
+        - cover_image
+        - location_description
+        - best_time
+        - source
+      properties:
+        spot_id: {$ref: '#/components/schemas/OpaqueId'}
+        poi_id: {$ref: '#/components/schemas/OpaqueId'}
+        poi_name: {type: string, minLength: 1}
+        spot_name: {type: string, minLength: 1}
+        cover_image:
+          anyOf:
+            - $ref: '#/components/schemas/ReferencePhoto'
+            - type: 'null'
+        location_description: {type: string, minLength: 1}
+        best_time:
+          anyOf:
+            - $ref: '#/components/schemas/BestTime'
+            - type: 'null'
+        source:
+          anyOf:
+            - $ref: '#/components/schemas/SourceRef'
+            - type: 'null'
+
+    FeaturedPhotoSpotListResponse:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data:
+          type: array
+          maxItems: 10
+          items: {$ref: '#/components/schemas/FeaturedPhotoSpot'}
+
+    HealthResponse:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data:
+          type: object
+          additionalProperties: false
+          required: [status]
+          properties:
+            status: {type: string, const: ok}
+
+    ErrorDetail:
+      type: object
+      additionalProperties: false
+      required: [field, code, message]
+      properties:
+        field: {type: [string, 'null']}
+        code: {type: string, minLength: 1}
+        message: {type: string, minLength: 1}
+
+    ApiError:
+      type: object
+      additionalProperties: false
+      required: [code, message, details, request_id]
+      properties:
+        code: {type: string, minLength: 1}
+        message: {type: string, minLength: 1}
+        details:
+          type: array
+          items: {$ref: '#/components/schemas/ErrorDetail'}
+        request_id: {$ref: '#/components/schemas/OpaqueId'}
+
+    ApiErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error: {$ref: '#/components/schemas/ApiError'}

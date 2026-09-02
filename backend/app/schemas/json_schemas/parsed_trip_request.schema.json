@@ -1,0 +1,274 @@
+{
+  "$defs": {
+    "DailyTimeWindow": {
+      "properties": {
+        "start": {
+          "description": "每日可用开始时间，格式 HH:MM",
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "description": "每日可用结束时间，格式 HH:MM",
+          "title": "End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "DailyTimeWindow",
+      "type": "object"
+    },
+    "LodgingInput": {
+      "description": "用户住宿输入。填写时保留用户原文和地图匹配结果。",
+      "properties": {
+        "raw_text": {
+          "description": "用户输入的住宿原文",
+          "title": "Raw Text",
+          "type": "string"
+        },
+        "poi_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "地图匹配后的 POI ID，未匹配时为 null",
+          "title": "Poi Id"
+        },
+        "matched_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "地图匹配后的名称",
+          "title": "Matched Name"
+        }
+      },
+      "required": [
+        "raw_text"
+      ],
+      "title": "LodgingInput",
+      "type": "object"
+    }
+  },
+  "description": "用户完整旅行需求的结构化表示。",
+  "properties": {
+    "schema_version": {
+      "const": "1.1.0",
+      "default": "1.1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "request_id": {
+      "description": "唯一请求 ID",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "original_text": {
+      "description": "用户原始输入，逐字保留",
+      "title": "Original Text",
+      "type": "string"
+    },
+    "city": {
+      "description": "城市，MVP 只允许北京",
+      "title": "City",
+      "type": "string"
+    },
+    "start_date": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "出行开始日期，可为 null，不得猜测",
+      "title": "Start Date"
+    },
+    "end_date": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "出行结束日期，可为 null",
+      "title": "End Date"
+    },
+    "days": {
+      "description": "游玩天数，1-5",
+      "maximum": 5,
+      "minimum": 1,
+      "title": "Days",
+      "type": "integer"
+    },
+    "party_size": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "人数",
+      "title": "Party Size"
+    },
+    "companion_types": {
+      "description": "同行关系：独自/情侣/朋友/亲子等",
+      "items": {
+        "type": "string"
+      },
+      "title": "Companion Types",
+      "type": "array"
+    },
+    "must_include": {
+      "description": "必去景点",
+      "items": {
+        "type": "string"
+      },
+      "title": "Must Include",
+      "type": "array"
+    },
+    "must_exclude": {
+      "description": "排除景点",
+      "items": {
+        "type": "string"
+      },
+      "title": "Must Exclude",
+      "type": "array"
+    },
+    "interests": {
+      "description": "游览兴趣",
+      "items": {
+        "type": "string"
+      },
+      "title": "Interests",
+      "type": "array"
+    },
+    "photo_preferences": {
+      "description": "出片偏好",
+      "items": {
+        "type": "string"
+      },
+      "title": "Photo Preferences",
+      "type": "array"
+    },
+    "pace": {
+      "anyOf": [
+        {
+          "enum": [
+            "轻松",
+            "适中",
+            "紧凑"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "行程节奏",
+      "title": "Pace"
+    },
+    "lodging_input": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/LodgingInput"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "住宿输入"
+    },
+    "daily_time_window": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DailyTimeWindow"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "每日可用时间"
+    },
+    "transport_preferences": {
+      "description": "交通偏好",
+      "items": {
+        "type": "string"
+      },
+      "title": "Transport Preferences",
+      "type": "array"
+    },
+    "budget_cny": {
+      "anyOf": [
+        {
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "总预算，仅作参考",
+      "title": "Budget Cny"
+    },
+    "rewritten_queries": {
+      "description": "供检索使用，非用户原话",
+      "items": {
+        "type": "string"
+      },
+      "title": "Rewritten Queries",
+      "type": "array"
+    },
+    "other_constraints": {
+      "description": "其他约束",
+      "items": {
+        "type": "string"
+      },
+      "title": "Other Constraints",
+      "type": "array"
+    },
+    "assumptions": {
+      "description": "系统采用的可见假设",
+      "items": {
+        "type": "string"
+      },
+      "title": "Assumptions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "request_id",
+    "original_text",
+    "city",
+    "days"
+  ],
+  "title": "ParsedTripRequest",
+  "type": "object"
+}

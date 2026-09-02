@@ -1,0 +1,13 @@
+# veFaaS 打包排除：避免泄露密钥、上传无用大文件
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+tests/
+contracts/
+.env
+.vefaas/
+.DS_Store

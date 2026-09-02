@@ -1,0 +1,14 @@
+{
+  "error": {
+    "code": "plan_version_conflict",
+    "message": "行程已经更新，请刷新后再提交修改",
+    "details": [
+      {
+        "field": "base_plan_id",
+        "code": "stale_value",
+        "message": "提交的行程版本不是最新版本"
+      }
+    ],
+    "request_id": "api-request-example"
+  }
+}

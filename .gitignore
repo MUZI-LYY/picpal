@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# 环境与密钥
+.env*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# 运行时数据
+data/trips/
+data/raw_notes/
+data/ingestion_report.json
+data/verified_photo_spots.json
+data/*.json
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# 仅保留在本地或私有仓库的资料
+data/collection_batches/
+backend/app/data/internal_photo_spots.json
+backend/app/static/photos/
+docs/images/picpal-planner-home.jpg
+docs/images/picpal-itinerary-result.jpg
+frontend/public/v23/
+
+# 测试与工具
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.tox/
+
+# 构建与日志
+dist/
+build/
+*.log
+logs/
+.vefaas/
+
+# 系统
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
